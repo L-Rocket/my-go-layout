@@ -1,0 +1,4 @@
+/server
+*.test
+.DS_Store
+.env
