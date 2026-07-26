@@ -20,7 +20,7 @@ my-project/
 │   │   ├── memory/               # in-memory Store implementations (local default)
 │   │   └── logger/               # thin log/slog wrapper (JSON)
 │   ├── config/                   # env-first config with yaml overlay
-│   └── health/                   # liveness handler (never fatal)
+│   │                             # (/health lives in transport/http — liveness is a transport concern)
 ├── pkg/
 │   ├── jwt/                      # stdlib-only HS256 JWT (educational)
 │   ├── response/                 # one JSON envelope: {"data":...} / {"error":...}

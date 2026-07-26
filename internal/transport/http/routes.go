@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/L-Rocket/my-project/internal/health"
 	"github.com/L-Rocket/my-project/internal/message"
 	"github.com/L-Rocket/my-project/internal/session"
 	"github.com/L-Rocket/my-project/internal/user"
@@ -30,7 +29,11 @@ func NewEngine(d Deps) *gin.Engine {
 	r := gin.New()
 	r.Use(RequestLogger(d.Logger), CORS())
 
-	r.GET("/health", health.Handler(d.Store))
+	// Liveness: never fails — a down dependency must not hide the process
+	// from the orchestrator. Reports which storage main wired in.
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(nethttp.StatusOK, gin.H{"status": "up", "store": d.Store})
+	})
 
 	api := r.Group("/api")
 	api.POST("/users", createUser(d))
