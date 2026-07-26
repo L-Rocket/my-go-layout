@@ -55,6 +55,14 @@ internal/
   config/               # env vars with defaults — nothing else
 ```
 
+Slices live **flat** under `internal/` while there are few of them — a
+wrapper folder adds a path segment with no meaning. Once the domain
+exceeds **five** slices (or domain-adjacent packages appear: shared
+types, domain events), group them under `internal/domain/`
+(`internal/domain/session`, …) in one move. The name is `domain/`, not
+`core/` — it says what the packages are, not where they sit in a
+metaphor.
+
 ## Rules for future development
 
 **Adding an endpoint**
