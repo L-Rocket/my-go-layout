@@ -33,7 +33,7 @@ func newTestServer() *httptest.Server {
 	return httptest.NewServer(engine)
 }
 
-// envelope mirrors pkg/response: {"data": ...} / {"error": ...}
+// envelope: {"data": ...} / {"error": ...}
 type envelope struct {
 	Data  json.RawMessage `json:"data"`
 	Error string          `json:"error"`

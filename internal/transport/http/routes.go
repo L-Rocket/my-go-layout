@@ -9,8 +9,6 @@ import (
 	"github.com/L-Rocket/my-go-layout/internal/message"
 	"github.com/L-Rocket/my-go-layout/internal/session"
 	"github.com/L-Rocket/my-go-layout/internal/user"
-	"github.com/L-Rocket/my-go-layout/pkg/response"
-	"github.com/L-Rocket/my-go-layout/pkg/validator"
 )
 
 // Deps is everything the routes need, injected from main so this package
@@ -71,7 +69,7 @@ type postMessageReq struct {
 func createUser(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createUserReq
-		if !validator.BindJSON(c, &req) {
+		if !bindJSON(c, &req) {
 			return
 		}
 		u, err := d.Users.Create(c.Request.Context(), req.Name)
@@ -79,7 +77,7 @@ func createUser(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusCreated, u)
+		ok(c, nethttp.StatusCreated, u)
 	}
 }
 
@@ -90,14 +88,14 @@ func listUsers(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusOK, us)
+		ok(c, nethttp.StatusOK, us)
 	}
 }
 
 func createSession(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createSessionReq
-		if !validator.BindJSON(c, &req) {
+		if !bindJSON(c, &req) {
 			return
 		}
 		// 404 for a missing user is enforced here (transport), so the
@@ -111,7 +109,7 @@ func createSession(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusCreated, sess)
+		ok(c, nethttp.StatusCreated, sess)
 	}
 }
 
@@ -119,7 +117,7 @@ func listSessions(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.Query("user_id")
 		if userID == "" {
-			response.Error(c, nethttp.StatusBadRequest, "user_id query parameter is required")
+			fail(c, nethttp.StatusBadRequest, "user_id query parameter is required")
 			return
 		}
 		ss, err := d.Sessions.ListByUser(c.Request.Context(), userID)
@@ -127,14 +125,14 @@ func listSessions(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusOK, ss)
+		ok(c, nethttp.StatusOK, ss)
 	}
 }
 
 func endSession(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req endSessionReq
-		if !validator.BindJSON(c, &req) {
+		if !bindJSON(c, &req) {
 			return
 		}
 		sess, err := d.Sessions.End(c.Request.Context(), c.Param("id"), req.UserID)
@@ -142,14 +140,14 @@ func endSession(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusOK, sess)
+		ok(c, nethttp.StatusOK, sess)
 	}
 }
 
 func postMessage(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req postMessageReq
-		if !validator.BindJSON(c, &req) {
+		if !bindJSON(c, &req) {
 			return
 		}
 		m, err := d.Messages.Post(c.Request.Context(), c.Param("id"), req.UserID, req.Content)
@@ -157,7 +155,7 @@ func postMessage(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusCreated, m)
+		ok(c, nethttp.StatusCreated, m)
 	}
 }
 
@@ -165,7 +163,7 @@ func listMessages(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.Query("user_id")
 		if userID == "" {
-			response.Error(c, nethttp.StatusBadRequest, "user_id query parameter is required")
+			fail(c, nethttp.StatusBadRequest, "user_id query parameter is required")
 			return
 		}
 		ms, err := d.Messages.ListBySession(c.Request.Context(), c.Param("id"), userID)
@@ -173,6 +171,6 @@ func listMessages(d Deps) gin.HandlerFunc {
 			handleError(c, err)
 			return
 		}
-		response.OK(c, nethttp.StatusOK, ms)
+		ok(c, nethttp.StatusOK, ms)
 	}
 }

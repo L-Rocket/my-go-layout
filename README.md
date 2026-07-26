@@ -21,10 +21,7 @@ my-project/
 │   │   └── logger/               # thin log/slog wrapper (JSON)
 │   ├── config/                   # env-first config with yaml overlay
 │   │                             # (/health lives in transport/http — liveness is a transport concern)
-├── pkg/
-│   ├── jwt/                      # stdlib-only HS256 JWT (educational)
-│   ├── response/                 # one JSON envelope: {"data":...} / {"error":...}
-│   └── validator/                # gin binding errors → 400 envelope
+│   └── jwt/                      # stdlib-only HS256 JWT (educational)
 ├── api/proto/                    # gRPC contracts will live here (README only for now)
 ├── migrations/                   # SQL migrations (timestamped naming; README only for now)
 ├── configs/config.yaml           # commented example config
