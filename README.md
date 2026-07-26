@@ -17,9 +17,9 @@ my-go-layout/
 │   ├── infrastructure/
 │   │   ├── postgrest/            # Store implementations over Supabase PostgREST
 │   │   ├── memory/               # in-memory Store implementations (local default)
-│   │   └── logger/               # thin log/slog wrapper (JSON)
-│   ├── config/                   # env vars with defaults — nothing else
-│   └── jwt/                      # stdlib-only HS256 JWT (educational)
+│   │   ├── logger/               # thin log/slog wrapper (JSON)
+│   │   └── jwt/                  # stdlib-only HS256 JWT (educational)
+│   └── config/                   # env vars with defaults — nothing else
 ├── api/proto/                    # gRPC contracts will live here (README only for now)
 ├── migrations/                   # SQL migrations (timestamped naming; README only for now)
 └── Makefile / Dockerfile / .gitignore
