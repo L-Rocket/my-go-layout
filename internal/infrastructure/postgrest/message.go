@@ -2,6 +2,7 @@ package postgrest
 
 import (
 	"context"
+	"errors"
 	"net/url"
 
 	"github.com/L-Rocket/my-go-layout/internal/message"
@@ -23,9 +24,12 @@ func (s *MessageStore) Create(ctx context.Context, m *message.Message) error {
 	if err := s.c.do(ctx, "POST", "/messages", m, &rows, "return=representation"); err != nil {
 		return err
 	}
-	if len(rows) > 0 {
-		m.ID, m.CreatedAt = rows[0].ID, rows[0].CreatedAt
+	// return=representation must hand back the stored row; without it the
+	// DB-assigned ID is lost and the caller gets a half-populated struct.
+	if len(rows) == 0 {
+		return errors.New("postgrest: create returned no row")
 	}
+	m.ID, m.CreatedAt = rows[0].ID, rows[0].CreatedAt
 	return nil
 }
 

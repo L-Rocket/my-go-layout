@@ -16,7 +16,6 @@ import (
 	"github.com/L-Rocket/my-go-layout/internal/message"
 	"github.com/L-Rocket/my-go-layout/internal/session"
 	transporthttp "github.com/L-Rocket/my-go-layout/internal/transport/http"
-	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // full stack: real services over memory stores, exactly as main wires them
@@ -25,7 +24,6 @@ func newTestServer() *httptest.Server {
 	sessionSvc := session.NewService(memory.NewSessionStore())
 	engine := transporthttp.NewEngine(transporthttp.Deps{
 		Logger:   slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Users:    user.NewService(memory.NewUserStore()),
 		Sessions: sessionSvc,
 		Messages: message.NewService(memory.NewMessageStore(), sessionSvc),
 		Store:    "memory",
@@ -66,22 +64,9 @@ func do(t *testing.T, method, url string, body any) (int, envelope) {
 	return resp.StatusCode, env
 }
 
-func TestHappyPathChain(t *testing.T) {
-	srv := newTestServer()
-	defer srv.Close()
-
-	// create user
-	code, env := do(t, "POST", srv.URL+"/api/users", map[string]string{"name": "ada"})
-	if code != http.StatusCreated {
-		t.Fatalf("create user: status %d, err %q", code, env.Error)
-	}
-	var u user.User
-	if err := json.Unmarshal(env.Data, &u); err != nil {
-		t.Fatal(err)
-	}
-
-	// create session for that user
-	code, env = do(t, "POST", srv.URL+"/api/sessions", map[string]string{"user_id": u.ID, "title": "demo"})
+func createSession(t *testing.T, baseURL, userID string) session.Session {
+	t.Helper()
+	code, env := do(t, "POST", baseURL+"/api/sessions", map[string]string{"user_id": userID, "title": "demo"})
 	if code != http.StatusCreated {
 		t.Fatalf("create session: status %d, err %q", code, env.Error)
 	}
@@ -89,18 +74,26 @@ func TestHappyPathChain(t *testing.T) {
 	if err := json.Unmarshal(env.Data, &s); err != nil {
 		t.Fatal(err)
 	}
+	return s
+}
+
+func TestHappyPathChain(t *testing.T) {
+	srv := newTestServer()
+	defer srv.Close()
+
+	s := createSession(t, srv.URL, "user-ada")
 
 	// post two messages
 	for _, content := range []string{"hello", "world"} {
-		code, env = do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/messages",
-			map[string]string{"user_id": u.ID, "content": content})
+		code, env := do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/messages",
+			map[string]string{"user_id": "user-ada", "content": content})
 		if code != http.StatusCreated {
 			t.Fatalf("post message: status %d, err %q", code, env.Error)
 		}
 	}
 
 	// list messages back, in order
-	code, env = do(t, "GET", fmt.Sprintf("%s/api/sessions/%s/messages?user_id=%s", srv.URL, s.ID, u.ID), nil)
+	code, env := do(t, "GET", fmt.Sprintf("%s/api/sessions/%s/messages?user_id=user-ada", srv.URL, s.ID), nil)
 	if code != http.StatusOK {
 		t.Fatalf("list messages: status %d, err %q", code, env.Error)
 	}
@@ -131,39 +124,35 @@ func TestForbiddenNotOwner(t *testing.T) {
 	srv := newTestServer()
 	defer srv.Close()
 
-	_, env := do(t, "POST", srv.URL+"/api/users", map[string]string{"name": "owner"})
-	var owner user.User
-	if err := json.Unmarshal(env.Data, &owner); err != nil {
-		t.Fatal(err)
-	}
-	_, env = do(t, "POST", srv.URL+"/api/sessions", map[string]string{"user_id": owner.ID, "title": "private"})
-	var s session.Session
-	if err := json.Unmarshal(env.Data, &s); err != nil {
-		t.Fatal(err)
-	}
+	s := createSession(t, srv.URL, "user-owner")
 
-	code, env := do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/end", map[string]string{"user_id": "user-someone-else"})
+	code, env := do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/end", map[string]string{"user_id": "user-intruder"})
 	if code != http.StatusForbidden {
 		t.Fatalf("status = %d, want 403 (err %q)", code, env.Error)
 	}
 }
 
-func TestNotFoundMissingUser(t *testing.T) {
+func TestNotFoundMissingSession(t *testing.T) {
 	srv := newTestServer()
 	defer srv.Close()
 
-	code, env := do(t, "POST", srv.URL+"/api/sessions", map[string]string{"user_id": "user-ghost", "title": "x"})
+	code, env := do(t, "POST", srv.URL+"/api/sessions/sess-ghost/end", map[string]string{"user_id": "user-ada"})
 	if code != http.StatusNotFound {
 		t.Fatalf("status = %d, want 404 (err %q)", code, env.Error)
 	}
 }
 
-func TestConflictDuplicateName(t *testing.T) {
+func TestConflictPostAfterEnd(t *testing.T) {
 	srv := newTestServer()
 	defer srv.Close()
 
-	do(t, "POST", srv.URL+"/api/users", map[string]string{"name": "ada"})
-	code, env := do(t, "POST", srv.URL+"/api/users", map[string]string{"name": "ada"})
+	s := createSession(t, srv.URL, "user-ada")
+	if code, env := do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/end", map[string]string{"user_id": "user-ada"}); code != http.StatusOK {
+		t.Fatalf("end session: status %d, err %q", code, env.Error)
+	}
+
+	code, env := do(t, "POST", srv.URL+"/api/sessions/"+s.ID+"/messages",
+		map[string]string{"user_id": "user-ada", "content": "too late"})
 	if code != http.StatusConflict {
 		t.Fatalf("status = %d, want 409 (err %q)", code, env.Error)
 	}

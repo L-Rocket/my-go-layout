@@ -8,27 +8,25 @@ import (
 	"github.com/L-Rocket/my-go-layout/internal/message"
 )
 
-// MessageStore is an in-memory message.Store. IDs auto-increment per
-// session (like a per-session sequence) so post order is just ID order.
+// MessageStore is an in-memory message.Store. IDs come from one global
+// counter (matching the bigserial semantics of the PostgREST backend) so
+// post order is just ID order and both backends behave identically.
 type MessageStore struct {
-	mu      sync.Mutex
-	byID    map[string][]*message.Message // sessionID → messages in order
-	nextSeq map[string]int64              // sessionID → last issued ID
+	mu   sync.Mutex
+	byID map[string][]*message.Message // sessionID → messages in order
+	next int64                         // last issued ID, across all sessions
 }
 
 func NewMessageStore() *MessageStore {
-	return &MessageStore{
-		byID:    make(map[string][]*message.Message),
-		nextSeq: make(map[string]int64),
-	}
+	return &MessageStore{byID: make(map[string][]*message.Message)}
 }
 
 func (s *MessageStore) Create(_ context.Context, m *message.Message) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.nextSeq[m.SessionID]++
+	s.next++
 	cp := *m
-	cp.ID = s.nextSeq[m.SessionID]
+	cp.ID = s.next
 	cp.CreatedAt = time.Now().UTC()
 	s.byID[m.SessionID] = append(s.byID[m.SessionID], &cp)
 	m.ID, m.CreatedAt = cp.ID, cp.CreatedAt

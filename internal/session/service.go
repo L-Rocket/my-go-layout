@@ -16,9 +16,9 @@ func NewService(store Store) *Service {
 	return &Service{store: store}
 }
 
-// Create starts a new active session for a user. Existence of the user is
-// the caller's concern (the transport checks it and returns 404), keeping
-// this module free of any user dependency.
+// Create starts a new active session owned by userID. Ownership is just
+// a string here — this demo has no user module, so there is nothing to
+// validate it against.
 func (s *Service) Create(ctx context.Context, userID, title string) (*Session, error) {
 	sess := New(userID, title)
 	if err := s.store.Create(ctx, sess); err != nil {

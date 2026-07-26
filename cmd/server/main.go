@@ -23,7 +23,6 @@ import (
 	"github.com/L-Rocket/my-go-layout/internal/session"
 	transportgrpc "github.com/L-Rocket/my-go-layout/internal/transport/grpc"
 	transporthttp "github.com/L-Rocket/my-go-layout/internal/transport/http"
-	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 func main() {
@@ -42,19 +41,16 @@ func run() error {
 
 	// --- infrastructure: memory by default, PostgREST when configured ---
 	var (
-		userStore    user.Store
 		sessionStore session.Store
 		messageStore message.Store
 		storeName    string
 	)
 	if cfg.UsePostgREST() {
 		pc := postgrest.New(cfg.SupabaseURL, cfg.SupabaseServiceKey)
-		userStore = postgrest.NewUserStore(pc)
 		sessionStore = postgrest.NewSessionStore(pc)
 		messageStore = postgrest.NewMessageStore(pc)
 		storeName = "postgrest"
 	} else {
-		userStore = memory.NewUserStore()
 		sessionStore = memory.NewSessionStore()
 		messageStore = memory.NewMessageStore()
 		storeName = "memory"
@@ -62,14 +58,12 @@ func run() error {
 	log.Info("storage selected", "store", storeName)
 
 	// --- domain services: message depends on session rules, not storage ---
-	userSvc := user.NewService(userStore)
 	sessionSvc := session.NewService(sessionStore)
 	messageSvc := message.NewService(messageStore, sessionSvc)
 
 	// --- transports ---
 	engine := transporthttp.NewEngine(transporthttp.Deps{
 		Logger:   log,
-		Users:    userSvc,
 		Sessions: sessionSvc,
 		Messages: messageSvc,
 		Store:    storeName,

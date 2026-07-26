@@ -8,14 +8,12 @@ import (
 
 	"github.com/L-Rocket/my-go-layout/internal/message"
 	"github.com/L-Rocket/my-go-layout/internal/session"
-	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // Deps is everything the routes need, injected from main so this package
 // stays assembly-free.
 type Deps struct {
 	Logger   *slog.Logger
-	Users    *user.Service
 	Sessions *session.Service
 	Messages *message.Service
 	Store    string // "memory" | "postgrest", for the health payload
@@ -34,8 +32,6 @@ func NewEngine(d Deps) *gin.Engine {
 	})
 
 	api := r.Group("/api")
-	api.POST("/users", createUser(d))
-	api.GET("/users", listUsers(d))
 	api.POST("/sessions", createSession(d))
 	api.GET("/sessions", listSessions(d))
 	api.POST("/sessions/:id/end", endSession(d))
@@ -45,10 +41,6 @@ func NewEngine(d Deps) *gin.Engine {
 }
 
 // --- request bodies: validation tags make gin reject bad input at binding ---
-
-type createUserReq struct {
-	Name string `json:"name" binding:"required"`
-}
 
 type createSessionReq struct {
 	UserID string `json:"user_id" binding:"required"`
@@ -65,43 +57,12 @@ type postMessageReq struct {
 }
 
 // --- handlers: parse → call domain service → map error → envelope ---
-
-func createUser(d Deps) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var req createUserReq
-		if !bindJSON(c, &req) {
-			return
-		}
-		u, err := d.Users.Create(c.Request.Context(), req.Name)
-		if err != nil {
-			handleError(c, err)
-			return
-		}
-		ok(c, nethttp.StatusCreated, u)
-	}
-}
-
-func listUsers(d Deps) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		us, err := d.Users.List(c.Request.Context())
-		if err != nil {
-			handleError(c, err)
-			return
-		}
-		ok(c, nethttp.StatusOK, us)
-	}
-}
+// No business rules here: ownership and lifecycle live in the services.
 
 func createSession(d Deps) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createSessionReq
 		if !bindJSON(c, &req) {
-			return
-		}
-		// 404 for a missing user is enforced here (transport), so the
-		// session module stays free of any user dependency.
-		if _, err := d.Users.Get(c.Request.Context(), req.UserID); err != nil {
-			handleError(c, err)
 			return
 		}
 		sess, err := d.Sessions.Create(c.Request.Context(), req.UserID, req.Title)

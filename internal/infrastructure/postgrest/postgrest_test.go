@@ -10,7 +10,6 @@ import (
 	"github.com/L-Rocket/my-go-layout/internal/infrastructure/postgrest"
 	"github.com/L-Rocket/my-go-layout/internal/message"
 	"github.com/L-Rocket/my-go-layout/internal/session"
-	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // fakeSupabase records the last request and replies with the canned body.
@@ -66,29 +65,6 @@ func TestSessionStoreGetNotFound(t *testing.T) {
 	store := postgrest.NewSessionStore(postgrest.New(f.srv.URL, "svc-key"))
 	if _, err := store.Get(context.Background(), "sess-nope"); err != session.ErrNotFound {
 		t.Fatalf("err = %v, want session.ErrNotFound", err)
-	}
-}
-
-func TestUserStoreCreate(t *testing.T) {
-	f := newFake(t, http.StatusCreated, `[{"id":"user-1","name":"ada","created_at":"2026-01-01T00:00:00Z"}]`)
-	store := postgrest.NewUserStore(postgrest.New(f.srv.URL, "svc-key"))
-
-	u := user.New("ada")
-	if err := store.Create(context.Background(), u); err != nil {
-		t.Fatalf("Create: %v", err)
-	}
-	if f.lastMethod != "POST" || f.lastPath != "/rest/v1/users" {
-		t.Fatalf("request = %s %s", f.lastMethod, f.lastPath)
-	}
-	f.assertAuth(t)
-}
-
-func TestUserStoreCreateDuplicate(t *testing.T) {
-	// unique-index violation surfaces as HTTP 409 from PostgREST
-	f := newFake(t, http.StatusConflict, `{"code":"23505"}`)
-	store := postgrest.NewUserStore(postgrest.New(f.srv.URL, "svc-key"))
-	if err := store.Create(context.Background(), user.New("ada")); err != user.ErrDuplicateName {
-		t.Fatalf("err = %v, want user.ErrDuplicateName", err)
 	}
 }
 
