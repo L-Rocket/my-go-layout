@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // UserStore is an in-memory user.Store. Name uniqueness is enforced here

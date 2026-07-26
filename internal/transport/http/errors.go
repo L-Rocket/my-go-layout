@@ -6,10 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/L-Rocket/my-project/internal/message"
-	"github.com/L-Rocket/my-project/internal/session"
-	"github.com/L-Rocket/my-project/internal/user"
-	"github.com/L-Rocket/my-project/pkg/response"
+	"github.com/L-Rocket/my-go-layout/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/user"
+	"github.com/L-Rocket/my-go-layout/pkg/response"
 )
 
 // handleError is the ONLY place domain errors become HTTP statuses.

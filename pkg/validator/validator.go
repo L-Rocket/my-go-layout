@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/L-Rocket/my-project/pkg/response"
+	"github.com/L-Rocket/my-go-layout/pkg/response"
 )
 
 // BindJSON binds the request body into v. On failure it writes a 400

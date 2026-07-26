@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/L-Rocket/my-project/internal/infrastructure/memory"
-	"github.com/L-Rocket/my-project/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/memory"
+	"github.com/L-Rocket/my-go-layout/internal/session"
 )
 
 func newService() *session.Service {

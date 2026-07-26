@@ -15,15 +15,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/L-Rocket/my-project/internal/config"
-	"github.com/L-Rocket/my-project/internal/infrastructure/logger"
-	"github.com/L-Rocket/my-project/internal/infrastructure/memory"
-	"github.com/L-Rocket/my-project/internal/infrastructure/postgrest"
-	"github.com/L-Rocket/my-project/internal/message"
-	"github.com/L-Rocket/my-project/internal/session"
-	transportgrpc "github.com/L-Rocket/my-project/internal/transport/grpc"
-	transporthttp "github.com/L-Rocket/my-project/internal/transport/http"
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/config"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/logger"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/memory"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/postgrest"
+	"github.com/L-Rocket/my-go-layout/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/session"
+	transportgrpc "github.com/L-Rocket/my-go-layout/internal/transport/grpc"
+	transporthttp "github.com/L-Rocket/my-go-layout/internal/transport/http"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 func main() {

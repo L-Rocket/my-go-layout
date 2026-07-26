@@ -6,8 +6,8 @@ package memory
 import (
 	"sort"
 
-	"github.com/L-Rocket/my-project/internal/session"
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // Shared ordering helpers: the Store contracts promise "oldest first",

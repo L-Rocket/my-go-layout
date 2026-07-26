@@ -1,4 +1,4 @@
-module github.com/L-Rocket/my-project
+module github.com/L-Rocket/my-go-layout
 
 go 1.25.0
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/L-Rocket/my-project/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/session"
 )
 
 // SessionStore implements session.Store over the "sessions" table.

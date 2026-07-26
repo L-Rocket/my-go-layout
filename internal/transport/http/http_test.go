@@ -12,11 +12,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/L-Rocket/my-project/internal/infrastructure/memory"
-	"github.com/L-Rocket/my-project/internal/message"
-	"github.com/L-Rocket/my-project/internal/session"
-	transporthttp "github.com/L-Rocket/my-project/internal/transport/http"
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/memory"
+	"github.com/L-Rocket/my-go-layout/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/session"
+	transporthttp "github.com/L-Rocket/my-go-layout/internal/transport/http"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // full stack: real services over memory stores, exactly as main wires them

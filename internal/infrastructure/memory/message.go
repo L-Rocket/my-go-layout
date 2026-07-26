@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/L-Rocket/my-project/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/message"
 )
 
 // MessageStore is an in-memory message.Store. IDs auto-increment per

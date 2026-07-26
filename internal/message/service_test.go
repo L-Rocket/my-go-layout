@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/L-Rocket/my-project/internal/infrastructure/memory"
-	"github.com/L-Rocket/my-project/internal/message"
-	"github.com/L-Rocket/my-project/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/memory"
+	"github.com/L-Rocket/my-go-layout/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/session"
 )
 
 // real session service over memory storage — the cross-module wiring

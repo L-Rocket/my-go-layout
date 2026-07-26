@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // UserStore implements user.Store over the "users" table. The table is

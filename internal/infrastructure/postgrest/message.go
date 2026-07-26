@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/L-Rocket/my-project/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/message"
 )
 
 // MessageStore implements message.Store over the "messages" table. IDs

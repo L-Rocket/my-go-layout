@@ -3,7 +3,7 @@ package message
 import (
 	"context"
 
-	"github.com/L-Rocket/my-project/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/session"
 )
 
 // SessionService is the slice of session.Service this module needs. It is

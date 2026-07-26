@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/L-Rocket/my-project/internal/infrastructure/postgrest"
-	"github.com/L-Rocket/my-project/internal/message"
-	"github.com/L-Rocket/my-project/internal/session"
-	"github.com/L-Rocket/my-project/internal/user"
+	"github.com/L-Rocket/my-go-layout/internal/infrastructure/postgrest"
+	"github.com/L-Rocket/my-go-layout/internal/message"
+	"github.com/L-Rocket/my-go-layout/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/user"
 )
 
 // fakeSupabase records the last request and replies with the canned body.

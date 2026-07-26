@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/L-Rocket/my-project/internal/session"
+	"github.com/L-Rocket/my-go-layout/internal/session"
 )
 
 // SessionStore is an in-memory session.Store. Safe for concurrent use;
