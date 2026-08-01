@@ -107,6 +107,14 @@ metaphor.
 - Transport: full-stack `httptest` with real services + memory stores.
 - Infrastructure/postgrest: `httptest`-faked Supabase asserting paths,
   headers, and error mapping.
+- `test/`: whole-service integration tests (package `test`). Assemble the
+  app exactly as `cmd/server/main.go` wires it (memory stores → domain
+  services → transports) and drive the PUBLIC API over real ports. Unit
+  tests stay next to the code; `test/` is the only place cross-layer
+  end-to-end tests live. It may import `internal/` (same module) but must
+  use exported APIs only, and fakes belong only at true external
+  boundaries — there are none by default, since memory is the local
+  backend.
 - Gates before every push: `gofmt -l .`, `GOTOOLCHAIN=local go vet ./...`,
   `GOTOOLCHAIN=local go test ./...` (Makefile pins `GOTOOLCHAIN=local`;
   the `go` directive stays on the 1.25 line).

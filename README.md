@@ -21,6 +21,7 @@ my-go-layout/
 │   └── config/                   # env vars with defaults — nothing else
 ├── api/proto/                    # gRPC contracts will live here (README only for now)
 ├── migrations/                   # SQL migrations (timestamped naming; README only for now)
+├── test/                         # whole-service integration tests: assembled like cmd/server, driven over the public API on real ports
 └── Makefile / Dockerfile / .gitignore
 ```
 
