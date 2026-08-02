@@ -74,11 +74,33 @@ wired; otherwise the in-memory stores are used. The choice is logged
 The PostgREST side assumes `sessions`/`messages` tables exist — schema is
 not shipped in this demo.
 
-## Tests & gates
+## Testing
+
+Stdlib `testing` only; no testify, no external services needed.
 
 ```sh
 make build vet test   # GOTOOLCHAIN=local is pinned in the Makefile
 ```
 
-Stdlib `testing` only; no external services needed — the PostgREST tests
-run against an `httptest` fake.
+The repo has four test layers, each with a distinct job:
+
+- **Domain slices** (next to the code): unit-test `Service` against the
+  memory store — no servers, no network.
+- **Transport**: full-stack `httptest` with real services + memory stores.
+- **Infrastructure/postgrest**: `httptest`-faked Supabase asserting paths,
+  headers, and error mapping.
+- **`test/` — whole-service integration tests** (package `test`). The app
+  is assembled here **exactly as `cmd/server/main.go` wires it** (memory
+  stores → domain services → transports) and driven over its **public
+  API on real loopback ports** — no `httptest`, no reaching into
+  internals. Rules: exported APIs only (it may import `internal/` as the
+  same module), and **fakes belong only at true external boundaries** —
+  there are none here, since memory is the default backend.
+
+Current integration coverage: `TestHTTPSessionLifecycle` (create → post
+message → list → end → posting after end returns 409) and
+`TestGRPCReflection` (the gRPC server comes up on a real port and
+answers a reflection ListServices call).
+
+Unit tests stay next to the code they cover; `test/` is the only place
+cross-layer end-to-end tests live.
