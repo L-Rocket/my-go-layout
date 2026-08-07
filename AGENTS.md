@@ -115,9 +115,16 @@ metaphor.
   use exported APIs only, and fakes belong only at true external
   boundaries — there are none by default, since memory is the local
   backend.
-- Gates before every push: `gofmt -l .`, `GOTOOLCHAIN=local go vet ./...`,
-  `GOTOOLCHAIN=local go test ./...` (Makefile pins `GOTOOLCHAIN=local`;
-  the `go` directive stays on the 1.25 line).
+- Gates before every push: `make gates` (fmt check + vet + test). The raw
+  gate commands: `gofmt -l .` clean, `GOTOOLCHAIN=local go vet ./...`,
+  `GOTOOLCHAIN=local go test ./...` (the `go` directive stays on the 1.25
+  line).
+
+**Standard Makefile** — drop-in, same in every repo: binary name = repo
+dir name, entrypoint `./cmd/server`; targets `build`, `run` (zero-dep),
+`test`, `vet`, `fmt`, `fmt-fix`, `gates`, `clean`, `tidy`. The Makefile
+pins `GOTOOLCHAIN=local` so a newer local toolchain never silently bumps
+go.mod past what the `golang:1.25` Docker image accepts.
 
 ## Deliberate non-goals (demo scope)
 

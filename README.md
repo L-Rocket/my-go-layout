@@ -79,7 +79,7 @@ not shipped in this demo.
 Stdlib `testing` only; no testify, no external services needed.
 
 ```sh
-make build vet test   # GOTOOLCHAIN=local is pinned in the Makefile
+make build vet test   # standard Makefile; `make gates` before every push
 ```
 
 The repo has four test layers, each with a distinct job:

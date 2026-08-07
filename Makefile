@@ -1,19 +1,36 @@
-# Pinned so a future `go` directive never silently pulls a newer toolchain.
+# Standard Makefile (go-repo-rules): binary name = repo dir name,
+# `make gates` before every push. GOTOOLCHAIN=local guards against dev
+# machines silently pulling a newer toolchain than the golang:1.25
+# Docker image accepts.
 export GOTOOLCHAIN=local
 
-.PHONY: build vet test run tidy
+BINARY := $(notdir $(CURDIR))
 
 build:
-	go build ./...
-
-vet:
-	go vet ./...
-
-test:
-	go test ./...
+	go build -o $(BINARY) ./cmd/server
 
 run:
 	go run ./cmd/server
 
+test:
+	go test ./...
+
+vet:
+	go vet ./...
+
+fmt:
+	@gofmt -l .
+
+fmt-fix:
+	gofmt -w .
+
+gates: fmt vet test
+
+clean:
+	rm -f $(BINARY)
+
 tidy:
 	go mod tidy
+	@grep '^go ' go.mod
+
+.PHONY: build run test vet fmt fmt-fix gates clean tidy
